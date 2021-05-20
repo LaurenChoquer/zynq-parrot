@@ -1,0 +1,38 @@
+//
+// this is an example of "host code" that can either run in cosim or on the PS
+// we can use the same C host code and
+// the API we provide abstracts away the
+// communication plumbing differences.
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include "bp_zynq_pl.h"
+
+int main(int argc, char **argv) {
+        bp_zynq_pl *zpl = new bp_zynq_pl(argc, argv);
+
+	// this program just communicates with a "loopback accelerator"
+	// that has 4 control registers that you can read and write
+	
+	int val1 = 0x00050004;
+	int val2 = 0x00060009;
+	int val3 = 0x00030003;
+	int mask1 = 0xf;
+	int mask2 = 0xf;
+	
+	zpl->axil_write(0x10 + ADDR_BASE, val1, mask1);
+
+//	assert( (zpl->axil_read(0x0 + ADDR_BASE) == 0x5));
+//	assert( (zpl->axil_read(0x8 + ADDR_BASE) == 0x0));
+
+//	zpl->axil_write(0x4 + ADDR_BASE, 0xDEADBEEF, mask1);
+
+//	assert( (zpl->axil_read(0x12 + ADDR_BASE) == -1));
+
+	zpl->done();
+
+	delete zpl;
+	exit(EXIT_SUCCESS);
+}
+
