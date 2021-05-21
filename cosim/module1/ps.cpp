@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	// this program just communicates with a "loopback accelerator"
 	// that has 4 control registers that you can read and write
 	
-	int val1 = 0x00050004;
+	int val1 = 0x00040006;
 	int val2 = 0x00060009;
 	int val3 = 0x00030003;
 	int mask1 = 0xf;

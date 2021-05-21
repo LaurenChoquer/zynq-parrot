@@ -99,7 +99,7 @@
 	assign rep_factor = (drop >= rep)? 8'd0 : (rep - drop);
 
 	reg [31:0] f2_data_o_mod;
-	assign f2_data_o_mod = (f2_v_o)? f2_data_o_mod : -32'd1;
+	assign f2_data_o_mod = (f2_v_o)? f2_data_o : -32'd1;
 
 	// AXI4LITE signals
 	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
@@ -390,7 +390,7 @@
 	end    
 
 	// Add user logic here
-    logic axi_reset;
+    	logic axi_reset;
 	assign axi_reset = ~S_AXI_ARESETN;
 	
 	// PS->PL fifo
@@ -413,7 +413,7 @@
     	, .yumi_i   (f1_yumi_i)
     	);
 
-	assign f1_v_i = S_AXI_WVALID;
+	assign f1_v_i = (axi_awaddr == 6'd4) & S_AXI_WVALID;
 	assign S_AXI_WREADY = f1_ready_o;
 	//assign f1_data_i = S_AXI_WDATA; 
 
@@ -424,26 +424,23 @@
 	  if (S_AXI_ARESETN == 1'b0) begin
 		cnt <= 8'd0;
 		f2_data_i <= 32'd0;
-		//f2_v_i <= 1'b0;
-		//f1_yumi_i <= 1'b0;
+		f1_yumi_i <= 1'b0;
 	  end
-	  else if ( f1_v_o ) begin
+	  else if ( f1_v_o & ~f1_yumi_i) begin
 	    	cnt <= rep_factor;
 		f2_data_i <= f1_data_o;
-		//f2_v_i <= 1'b1;
-		//f1_yumi_i <= 1'b0;
+		f1_yumi_i <= 1'b1;
 	  end
 	  else begin
-	    if ( cnt > 8'd0 ) begin
-		cnt <= cnt - 8'd1;
-		//f2_v_i <= 1'b0;
-		//f1_yumi_i <= 1'b1;
-	    end
+	    	f1_yumi_i <= 1'b0;
+	      	if ( cnt > 8'd0 ) begin
+		    cnt <= cnt - 8'd1;
+	    	end
 	  end
 	end
 
 	assign f2_v_i = (cnt != 8'd0);
-	assign f1_yumi_i = (cnt == 8'd1);
+	
 	//Counter to track # of free elements in PS->PL fifo
     	bsg_flow_counter #(
 	  .els_p(5)
